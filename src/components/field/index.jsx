@@ -8,20 +8,27 @@ import FormControl from '@material-ui/core/FormControl';
 
 /**
  * Note that Material UI needs some styling normalization here.
- * Specifically, when it comes to padding and height.
+ * As well, some of the hard-coded props (i.e. style) are dynamically
+ * altered by the Adapter utility.
  */
 const TextFieldWrapper = ({
   id,
   label,
   variant,
   error,
+  ...rest
 }) => {
   const El =
     variant === 'filled' ? FilledInput : OutlinedInput;
 
   return (
     <FormControl fullWidth id={`${id}-container`}>
-      <InputLabel required htmlFor={id}>
+      <InputLabel
+        variant={variant}
+        required
+        htmlFor={id}
+        {...rest}
+      >
         {label}
       </InputLabel>
       <El
@@ -37,9 +44,8 @@ const TextFieldWrapper = ({
         label={label}
         name={label}
         id={id}
+        {...rest}
       />
-
-      {/** The adapter utility will toggle the display prop. */}
       <FormHelperText
         id={`${id}-helper`}
         error

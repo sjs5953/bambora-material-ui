@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import Bambora, {
   Submit,
@@ -16,7 +17,7 @@ export default {
 };
 
 export const Demo = () => (
-  <Bambora onTokenization={console.log}>
+  <Bambora onTokenization={(e) => alert(e.token)}>
     <CreditCardField label="Credit card number" />
     <CvvField label="CVV" />
     <ExpiryField label="Expiry" />

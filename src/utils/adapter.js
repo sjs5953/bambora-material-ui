@@ -15,20 +15,6 @@ export const checkFormFieldComponentReadiness = (state) =>
     ? Object.values(state).every((v) => v.isReady)
     : false;
 
-export const controlSubmitButtonState = (setSubmit) => {
-  const e = document.getElementById(PAY);
-  invoke(
-    e,
-    setSubmit ? 'removeAttribute' : 'setAttribute',
-    'disabled',
-  );
-  invoke(
-    e,
-    `classList.${setSubmit ? 'remove' : 'add'}`,
-    DISABLED,
-  );
-};
-
 class FormFieldComponents {
   constructor(f) {
     if (!document)
@@ -43,6 +29,18 @@ class FormFieldComponents {
     this.helper = this.el.querySelector(`#${f}-helper`);
     this.input = this.el.querySelector(`#${f}`);
     this.label = this.el.querySelector('label');
+  }
+
+  static enableSubmit() {
+    const e = document.getElementById(PAY);
+    invoke(e, 'removeAttribute', 'disabled');
+    invoke(e, 'classList.remove', DISABLED);
+  }
+
+  static disableSubmit() {
+    const e = document.getElementById(PAY);
+    invoke(e, 'setAttribute', 'disabled', true);
+    invoke(e, 'classList.add', DISABLED);
   }
 
   setHelper(msg) {
@@ -61,6 +59,11 @@ class FormFieldComponents {
     this.hasValue = bool;
   }
 
+  setError(msg) {
+    this.hasError = true;
+    this.setHelper(msg);
+  }
+
   isComplete() {
     this.hasError = false;
     this.hasValue = true;
@@ -68,10 +71,8 @@ class FormFieldComponents {
     this.setHelper(null);
   }
 
-  isIncomplete(msg) {
-    this.hasError = true;
+  isIncomplete() {
     this.isReady = false;
-    this.setHelper(msg);
   }
 
   removeFocusedClassNames() {
@@ -123,23 +124,28 @@ export default (checkout) => {
     'empty',
     route(function(v) {
       this.setValue(!v.empty);
+      FormFieldComponents.disableSubmit();
     }),
   );
 
   checkout.on(
     'error',
     route(function(o) {
-      this.isIncomplete(o.message);
+      this.setError(o.message);
     }),
   );
 
   checkout.on(
     'complete',
-    route(function() {
-      this.isComplete();
-      controlSubmitButtonState(
-        checkFormFieldComponentReadiness(state),
-      );
+    route(function(v) {
+      if (v.complete) {
+        this.isComplete();
+        if (checkFormFieldComponentReadiness(state))
+          FormFieldComponents.enableSubmit();
+      } else {
+        this.isIncomplete();
+        FormFieldComponents.disableSubmit();
+      }
     }),
   );
 };
