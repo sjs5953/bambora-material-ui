@@ -1,0 +1,2 @@
+<h1>Bambora Material UI</h1>
+<p>Inspired by the Custom Checkouts on <a href="https://dev.na.bambora.com/docs/guides/custom_checkout/demos/">Bambora's website</a>, this implementation hooks into Material UI and takes care of validation and tokenization out-of-the-box. The only configuration you need to worry about is the ordering of the form fields, their labels and their stylistic configuration (i.e. input variant).</p>
