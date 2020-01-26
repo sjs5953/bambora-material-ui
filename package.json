@@ -1,7 +1,8 @@
 {
   "name": "bambora-material-ui",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
+  "main": "dist/index.js",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.8.3",
@@ -42,6 +43,7 @@
     "scriptjs": "^2.5.9"
   },
   "scripts": {
-    "storybook": "start-storybook"
+    "storybook": "start-storybook",
+    "build": "babel src -d dist --ignore **/*.stories.js,**/*.spec.js"
   }
 }
