@@ -6,11 +6,14 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 
+/**
+ * Note that Material UI needs some styling normalization here.
+ * Specifically, when it comes to padding and height.
+ */
 const TextFieldWrapper = ({
   id,
   label,
   variant,
-  margin,
   error,
 }) => {
   const El =
@@ -25,6 +28,12 @@ const TextFieldWrapper = ({
         required
         inputComponent="div"
         error={Boolean(error)}
+        inputProps={{
+          style: {
+            padding: 0,
+            height: 'auto',
+          },
+        }}
         label={label}
         name={label}
         id={id}

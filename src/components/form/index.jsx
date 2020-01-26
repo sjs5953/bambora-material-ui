@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import scriptJS from 'scriptjs';
-import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import { URL, PAY } from '../../utils/constants';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { URL } from '../../utils/constants';
 import Adapter from '../../utils/adapter';
 
 const Form = ({ onTokenization, children }) => {
@@ -39,21 +39,9 @@ const Form = ({ onTokenization, children }) => {
   return (
     <Box p={2}>
       {ready ? (
-        <form onSubmit={handleCheckout}>
-          {children}
-          {/** The adapter will toggle the disabled attr */}
-          <Button
-            id={PAY}
-            disabled
-            variant="contained"
-            color="primary"
-            type="submit"
-          >
-            Pay
-          </Button>
-        </form>
+        <form onSubmit={handleCheckout}>{children}</form>
       ) : (
-        'Loading'
+        <CircularProgress />
       )}
     </Box>
   );

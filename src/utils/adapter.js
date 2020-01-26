@@ -88,7 +88,15 @@ class FormFieldComponents {
 
 export default (checkout) => {
   const state = [CARD, CVV, EXP].reduce((acc, curr) => {
-    checkout.create(curr).mount(`#${curr}`);
+    checkout
+      .create(curr, {
+        style: {
+          base: {
+            padding: '27px 12px 10px',
+          },
+        },
+      })
+      .mount(`#${curr}`);
     return Object.assign(acc, {
       [curr]: new FormFieldComponents(curr),
     });
