@@ -8,7 +8,7 @@ import useScript from '../../utils/useScript';
 
 const Form = ({ onTokenization, children }) => {
   const remoteForm = React.createRef();
-  const [ready, hasError] = useScript(URL);
+  const [ready] = useScript(URL);
 
   React.useEffect(() => {
     if (!ready && !('customcheckout' in window)) return;
