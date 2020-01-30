@@ -1,24 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import scriptJS from 'scriptjs';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { URL } from '../../utils/constants';
 import Adapter from '../../utils/adapter';
+import useScript from '../../utils/useScript';
 
 const Form = ({ onTokenization, children }) => {
-  const [ready, setReady] = React.useState(false);
   const remoteForm = React.createRef();
-
-  React.useEffect(() => {
-    scriptJS(URL, () => {
-      const { customcheckout } = window;
-      if (customcheckout)
-        setTimeout(() => {
-          setReady(true);
-        }, 1500);
-    });
-  }, []);
+  const [ready, hasError] = useScript(URL);
 
   React.useEffect(() => {
     if (!ready && !('customcheckout' in window)) return;
@@ -37,13 +27,15 @@ const Form = ({ onTokenization, children }) => {
   };
 
   return (
-    <Box p={2}>
-      {ready ? (
-        <form onSubmit={handleCheckout}>{children}</form>
-      ) : (
-        <CircularProgress />
-      )}
-    </Box>
+    <>
+      <Box p={2}>
+        {ready ? (
+          <form onSubmit={handleCheckout}>{children}</form>
+        ) : (
+          <CircularProgress />
+        )}
+      </Box>
+    </>
   );
 };
 

@@ -39,6 +39,7 @@ const TextFieldWrapper = ({
           style: {
             padding: 0,
             height: 'auto',
+            minHeight: 56,
           },
         }}
         label={label}
