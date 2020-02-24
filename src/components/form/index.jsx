@@ -1,41 +1,63 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { invoke } from 'lodash';
 import { URL } from '../../utils/constants';
 import Adapter from '../../utils/adapter';
 import useScript from '../../utils/useScript';
+import { FetchingStateProvider } from '../fetching';
 
-const Form = ({ onTokenization, children }) => {
-  const remoteForm = React.createRef();
+const withCheckout = (Component) => (props) => {
   const [ready] = useScript(URL);
+  const remoteForm = React.useRef();
 
   React.useEffect(() => {
-    if (!ready && !('customcheckout' in window)) return;
-    const inst = window.customcheckout();
+    if (
+      (!ready && !('customcheckout' in window)) ||
+      remoteForm.current
+    )
+      return undefined;
 
+    const inst = window.customcheckout();
     Adapter(inst);
     remoteForm.current = inst;
+
+    return () => invoke(remoteForm, 'current.clearAll');
   }, [ready]);
 
-  const handleCheckout = (e) => {
-    e.preventDefault();
-    remoteForm.current.createToken((res) => {
-      if (onTokenization) onTokenization(res);
-      // noop
-    });
-  };
+  const handleCheckout = React.useCallback(
+    (pre, post) => (e) => {
+      e.preventDefault();
+
+      pre();
+      remoteForm.current.createToken((r) =>
+        post(r).then(() =>
+          invoke(remoteForm, 'current.clearAll'),
+        ),
+      );
+    },
+    [remoteForm],
+  );
+
+  return <Component {...props} onSubmit={handleCheckout} />;
+};
+
+const Form = ({ onTokenization, onSubmit, children }) => {
+  const [fetching, setFetching] = React.useState(false);
 
   return (
-    <>
-      <Box p={2}>
-        {ready ? (
-          <form onSubmit={handleCheckout}>{children}</form>
-        ) : (
-          <CircularProgress />
-        )}
-      </Box>
-    </>
+    <form
+      onSubmit={onSubmit(
+        () => setFetching(true),
+        (res) =>
+          onTokenization(res).then(() =>
+            setFetching(false),
+          ),
+      )}
+    >
+      <FetchingStateProvider fetching={fetching}>
+        {children}
+      </FetchingStateProvider>
+    </form>
   );
 };
 
@@ -44,6 +66,11 @@ Form.propTypes = {
    * Callback for post-adapter submission.
    */
   onTokenization: PropTypes.func.isRequired,
+
+  /**
+   * Callback to generate token.
+   */
+  onSubmit: PropTypes.func.isRequired,
 
   /**
    * Ideally, an area of Fields. The adapter assumes so.
@@ -55,4 +82,4 @@ Form.propTypes = {
   ]).isRequired,
 };
 
-export default Form;
+export default withCheckout(Form);

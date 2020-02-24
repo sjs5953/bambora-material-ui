@@ -17,7 +17,15 @@ export default {
 };
 
 export const Demo = () => (
-  <Bambora onTokenization={(e) => alert(e.token)}>
+  <Bambora
+    onTokenization={() =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 2000);
+      })
+    }
+  >
     <CreditCardField label="Credit card number" />
     <CvvField label="CVV" />
     <ExpiryField label="Expiry" />

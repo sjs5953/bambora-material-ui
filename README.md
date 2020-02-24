@@ -1,7 +1,7 @@
 <h1>Bambora Material UI</h1>
 <p>Inspired by the Custom Checkouts on <a href="https://dev.na.bambora.com/docs/guides/custom_checkout/demos/">Bambora's website</a>, this implementation hooks into Material UI and takes care of validation and tokenization. You just need to worry about ordering the form fields and setting their labels and styles (i.e. input variant).</p>
 
-<p><strong>Please note that additional tests and examples are on the way.</strong></p>
+<p><strong>Please note that tests and examples are on the way.</strong></p>
 
 ```javascript
 import React from 'react';
