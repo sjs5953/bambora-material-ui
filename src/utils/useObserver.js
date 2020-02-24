@@ -17,15 +17,18 @@ export default () => {
   }, []);
 
   React.useEffect(() => {
-    const observer = new MutationObserver(callback);
+    try {
+      const observer = new MutationObserver(callback);
+      observer.observe(ref.current, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
 
-    observer.observe(ref.current, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
-    return observer.disconnect;
+      return () => observer.disconnect();
+    } catch (e) {
+      return undefined;
+    }
   }, []);
 
   return {
