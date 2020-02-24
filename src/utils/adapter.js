@@ -2,8 +2,9 @@
 import { invoke } from './helpers';
 import {
   DISABLED,
+  IN_FOCUS,
+  HAS_ERROR,
   FOCUSED,
-  SHRINK,
   CARD,
   CVV,
   EXP,
@@ -16,7 +17,7 @@ export const checkFormFieldComponentReadiness = (state) =>
     : false;
 
 class FormFieldComponents {
-  constructor(f) {
+  constructor(f, instance) {
     if (!document)
       throw new Error('Global document required');
 
@@ -29,6 +30,7 @@ class FormFieldComponents {
     this.helper = this.el.querySelector(`#${f}-helper`);
     this.input = this.el.querySelector(`#${f}`);
     this.label = this.el.querySelector('label');
+    this.$bambora = instance;
   }
 
   static enableSubmit() {
@@ -62,10 +64,15 @@ class FormFieldComponents {
   setError(msg) {
     this.hasError = true;
     this.setHelper(msg);
+    invoke(this.input, 'setAttribute', HAS_ERROR, true);
+    invoke(this.label, 'setAttribute', HAS_ERROR, true);
   }
 
   isComplete() {
     this.hasError = false;
+    invoke(this.input, 'removeAttribute', HAS_ERROR);
+    invoke(this.label, 'removeAttribute', HAS_ERROR);
+
     this.hasValue = true;
     this.isReady = true;
     this.setHelper(null);
@@ -76,35 +83,64 @@ class FormFieldComponents {
   }
 
   removeFocusedClassNames() {
+    invoke(
+      this.input,
+      'parentElement.classList.remove',
+      FOCUSED,
+    );
+
     if (this.hasValue) return;
-    invoke(this.input, 'classList.remove', FOCUSED);
-    invoke(this.label, 'classList.remove', SHRINK);
+    invoke(this.input, 'removeAttribute', IN_FOCUS);
+    invoke(this.label, 'removeAttribute', IN_FOCUS);
   }
 
   setFocusedClassNames() {
-    invoke(this.input, 'classList.add', FOCUSED);
-    invoke(this.label, 'classList.add', SHRINK);
+    invoke(this.input, 'setAttribute', IN_FOCUS, true);
+    invoke(this.label, 'setAttribute', IN_FOCUS, true);
+    invoke(
+      this.input,
+      'parentElement.classList.add',
+      FOCUSED,
+    );
   }
 }
 
 export default (checkout) => {
   const state = [CARD, CVV, EXP].reduce((acc, curr) => {
-    checkout
-      .create(curr, {
-        style: {
-          base: {
-            padding: '27px 12px 10px',
-          },
+    const el = checkout.create(curr, {
+      style: {
+        base: {
+          padding: '27px 12px 10px',
         },
-      })
-      .mount(`#${curr}`);
+      },
+    });
+
+    if (
+      typeof window === 'undefined' ||
+      !document.getElementById(curr)
+    ) {
+      el.clear();
+      el.unmount();
+      return acc;
+    }
+
+    el.mount(`#${curr}`);
+
     return Object.assign(acc, {
-      [curr]: new FormFieldComponents(curr),
+      [curr]: new FormFieldComponents(curr, el),
     });
   }, {});
 
+  if (!Object.keys(state).length || !checkout) return;
+
   const route = (fn) => (args) =>
     fn.call(state[args.field], args);
+
+  // eslint-disable-next-line
+  checkout.clearAll = () =>
+    Object.values(state).forEach((v) => {
+      v.$bambora.clear();
+    });
 
   checkout.on(
     'focus',

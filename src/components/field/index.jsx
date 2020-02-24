@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputLabel from '@material-ui/core/InputLabel';
+import Skeleton from '@material-ui/lab/Skeleton';
 import FilledInput from '@material-ui/core/FilledInput';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import InputLabelWrapper from '../label';
+import useObserver from '../../utils/useObserver';
+import { FetchingState } from '../fetching';
 
 /**
  * Note that Material UI needs some styling normalization here.
@@ -21,20 +24,33 @@ const TextFieldWrapper = ({
   const El =
     variant === 'filled' ? FilledInput : OutlinedInput;
 
+  const { ref, hasError } = useObserver();
+  const { fetching } = React.useContext(FetchingState);
+
+  const commonAttrs = {
+    error: hasError,
+    required: true,
+    label,
+    variant,
+    ...rest,
+  };
+
   return (
-    <FormControl fullWidth id={`${id}-container`}>
-      <InputLabel
-        variant={variant}
-        required
-        htmlFor={id}
-        {...rest}
-      >
+    <FormControl
+      fullWidth
+      id={`${id}-container`}
+      style={{ marginBottom: 8 }}
+    >
+      <InputLabelWrapper htmlFor={id} {...commonAttrs}>
         {label}
-      </InputLabel>
+      </InputLabelWrapper>
       <El
-        required
+        id={id}
+        inputRef={ref}
         inputComponent="div"
-        error={Boolean(error)}
+        disabled={fetching}
+        readOnly={fetching}
+        name={label}
         inputProps={{
           style: {
             padding: 0,
@@ -42,14 +58,11 @@ const TextFieldWrapper = ({
             minHeight: 56,
           },
         }}
-        label={label}
-        name={label}
-        id={id}
-        {...rest}
+        {...commonAttrs}
       />
       <FormHelperText
-        id={`${id}-helper`}
         error
+        id={`${id}-helper`}
         style={{ display: 'none' }}
       >
         {error}
