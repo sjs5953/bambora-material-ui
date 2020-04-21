@@ -18,7 +18,7 @@ const withCheckout = (Component) => (props) => {
       return undefined;
 
     const inst = window.customcheckout();
-    Adapter(inst);
+    Adapter(inst, props.options);
     remoteForm.current = inst;
 
     return () => invoke(remoteForm, 'current.clearAll');

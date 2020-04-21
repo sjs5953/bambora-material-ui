@@ -32,3 +32,25 @@ export const Demo = () => (
     <Submit />
   </Bambora>
 );
+
+export const WithOptions = () => (
+  <Bambora
+    options={{
+      'card-number': {
+        brands: ['visa'],
+      },
+    }}
+    onTokenization={() =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 2000);
+      })
+    }
+  >
+    <CreditCardField label="Credit card number" />
+    <CvvField label="CVV" />
+    <ExpiryField label="Expiry" />
+    <Submit />
+  </Bambora>
+);

@@ -16,6 +16,23 @@ export const checkFormFieldComponentReadiness = (state) =>
     ? Object.values(state).every((v) => v.isReady)
     : false;
 
+export const getOptionByFieldName = (options = {}) => (
+  fieldName,
+) => {
+  try {
+    if (
+      typeof options !== 'object' ||
+      options === null ||
+      !(fieldName in options)
+    )
+      throw new Error('Unknown option');
+
+    return options[fieldName];
+  } catch (e) {
+    return {};
+  }
+};
+
 class FormFieldComponents {
   constructor(f, instance) {
     if (!document)
@@ -105,9 +122,12 @@ class FormFieldComponents {
   }
 }
 
-export default (checkout) => {
+export default (checkout, options) => {
+  const opts = getOptionByFieldName(options);
+
   const state = [CARD, CVV, EXP].reduce((acc, curr) => {
     const el = checkout.create(curr, {
+      ...opts(curr),
       style: {
         base: {
           padding: '27px 12px 10px',
