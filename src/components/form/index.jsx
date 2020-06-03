@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { invoke } from 'lodash';
+import Grid from '@material-ui/core/Grid';
 import { URL } from '../../utils/constants';
 import Adapter from '../../utils/adapter';
 import useScript from '../../utils/useScript';
@@ -55,7 +56,9 @@ const Form = ({ onTokenization, onSubmit, children }) => {
       )}
     >
       <FetchingStateProvider fetching={fetching}>
-        {children}
+        <Grid container spacing={1}>
+          {children}
+        </Grid>
       </FetchingStateProvider>
     </form>
   );

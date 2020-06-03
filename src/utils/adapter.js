@@ -129,9 +129,7 @@ export default (checkout, options) => {
     const el = checkout.create(curr, {
       ...opts(curr),
       style: {
-        base: {
-          padding: '27px 12px 10px',
-        },
+        base: {},
       },
     });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Grid from '@material-ui/core/Grid';
 import FilledInput from '@material-ui/core/FilledInput';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -8,6 +8,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabelWrapper from '../label';
 import useObserver from '../../utils/useObserver';
 import { FetchingState } from '../fetching';
+import { CARD } from '../../utils/constants';
 
 /**
  * Note that Material UI needs some styling normalization here.
@@ -19,55 +20,53 @@ const TextFieldWrapper = ({
   label,
   variant,
   error,
+  size,
   ...rest
 }) => {
   const El =
     variant === 'filled' ? FilledInput : OutlinedInput;
 
-  const { ref, hasError } = useObserver();
+  const { ref, hasError, inFocus } = useObserver();
   const { fetching } = React.useContext(FetchingState);
 
   const commonAttrs = {
     error: hasError,
     required: true,
+    size,
     label,
     variant,
     ...rest,
   };
 
   return (
-    <FormControl
-      fullWidth
-      id={`${id}-container`}
-      style={{ marginBottom: 8 }}
-    >
-      <InputLabelWrapper htmlFor={id} {...commonAttrs}>
-        {label}
-      </InputLabelWrapper>
-      <El
-        id={id}
-        inputRef={ref}
-        inputComponent="div"
-        disabled={fetching}
-        readOnly={fetching}
-        name={label}
-        inputProps={{
-          style: {
-            padding: 0,
-            height: 'auto',
-            minHeight: 56,
-          },
-        }}
-        {...commonAttrs}
-      />
-      <FormHelperText
-        error
-        id={`${id}-helper`}
-        style={{ display: 'none' }}
+    <Grid item md={id === CARD ? 12 : 6} xs={12}>
+      <FormControl
+        fullWidth
+        id={`${id}-container`}
+        size="small"
       >
-        {error}
-      </FormHelperText>
-    </FormControl>
+        <InputLabelWrapper htmlFor={id} {...commonAttrs}>
+          {label}
+        </InputLabelWrapper>
+        <El
+          id={id}
+          inputRef={ref}
+          inputComponent="div"
+          disabled={fetching}
+          readOnly={fetching}
+          name={label}
+          notched={inFocus}
+          {...commonAttrs}
+        />
+        <FormHelperText
+          error
+          id={`${id}-helper`}
+          style={{ display: 'none' }}
+        >
+          {error}
+        </FormHelperText>
+      </FormControl>
+    </Grid>
   );
 };
 
@@ -83,9 +82,18 @@ TextFieldWrapper.propTypes = {
   label: PropTypes.string.isRequired,
 
   /**
-   * Material UI variant name ("filled" or "outlined")
+   * Material UI variant name.
    */
-  variant: PropTypes.string,
+  variant: PropTypes.oneOf([
+    'standard',
+    'filled',
+    'outlined',
+  ]),
+
+  /**
+   * Matierial UI size name.
+   */
+  size: PropTypes.oneOf(['regular', 'small']),
 
   /**
    * Error message to display as field helper text.
@@ -100,7 +108,8 @@ TextFieldWrapper.propTypes = {
 
 TextFieldWrapper.defaultProps = {
   margin: undefined,
-  variant: 'filled',
+  variant: 'outlined',
+  size: 'small',
   error: '',
 };
 
